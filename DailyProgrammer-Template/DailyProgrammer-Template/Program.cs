@@ -16,12 +16,12 @@ using NUnit.Framework; //test classes need to have the using statement
 /// 
 ///
 ///     What was difficult about this challenge?
-/// 
-///
+///     Figuring out how to decrypt the text, even though in the end it was only a small change from the encryption.
+///     Even though i knew in my head what i wanted to do, for some reason i kept stumbling in the code, yet the answer was so simple.
 ///     
 ///
 ///     What was easier than expected about this challenge?
-///     
+///     Writing the encyption function went very fast.  
 ///
 ///
 ///
@@ -34,6 +34,14 @@ namespace DailyProgrammer_Template
     {
         static void Main(string[] args)
         {
+            RailFenceCipher encryptTest = new RailFenceCipher();
+            Console.WriteLine(encryptTest.Encrypt("THEQUICKBROWNFOXJUMPSOVERTHELAZYDOG", 4));
+            Console.WriteLine();
+            Console.WriteLine("TCNMRZHIKWFUPETAYEUBOOJSVHLDGQRXOEO");
+            Console.WriteLine();
+            Console.WriteLine(encryptTest.Decrypt("TCNMRZHIKWFUPETAYEUBOOJSVHLDGQRXOEO", 4));
+
+            Console.ReadKey();
         }
 
         /// <summary>
@@ -49,12 +57,66 @@ namespace DailyProgrammer_Template
 
     class RailFenceCipher
     {
+        int counter = 1;
+        int direction = -1;
 
-        public static string Encrypt(string encryptText, int numLines)
+        public RailFenceCipher() { }
+
+        public string Encrypt(string textToEncrypt, int numLines)
         {
-
-            return string.Empty;
+            int lineCount = 0;
+            int currentLine = 0;
+            string encryptedText = string.Empty;
+            while (lineCount < numLines)
+            {
+                currentLine = 0;
+                this.counter = 1;
+                for (int i = 0; i < textToEncrypt.Length; i++)
+                {
+                    if (currentLine == lineCount)
+                    {
+                        encryptedText += textToEncrypt[i];
+                    }
+                    currentLine += this.counter;
+                    if (currentLine <= 0 || currentLine >= numLines - 1)
+                    {
+                        this.counter *= this.direction;
+                    }
+                }
+                lineCount++;
+            }
+            return encryptedText;
         }
+
+        public string Decrypt(string textToDecrypt, int numLines)
+        {
+            int lineCount = 0;
+            int currentLine = 0;
+            string decryptedText = textToDecrypt;
+            int letterStepper = 0;
+            while (lineCount < numLines)
+            {
+                currentLine = 0;
+                this.counter = 1;
+                for (int i = 0; i < textToDecrypt.Length; i++)
+                {
+                    if (currentLine == lineCount)
+                    {
+                        decryptedText = decryptedText.Insert(i, textToDecrypt[letterStepper].ToString());
+                        decryptedText = decryptedText.Remove(i + 1, 1);
+                        letterStepper++;
+                    }
+                    currentLine += this.counter;
+                    if (currentLine <= 0 || currentLine >= numLines - 1)
+                    {
+                        this.counter *= this.direction;
+                    }
+                }
+                lineCount++;
+            }
+            return decryptedText;
+        }
+
     }
 
 
