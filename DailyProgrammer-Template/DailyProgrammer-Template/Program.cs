@@ -11,8 +11,8 @@ using NUnit.Framework; //test classes need to have the using statement
 ///     Challenge Name:  Rail Fence Ciper
 ///     Challenge #: 196
 ///     Challenge URL: http://www.reddit.com/r/dailyprogrammer/comments/2rnwzf/20150107_challenge_196_intermediate_rail_fence/
-///     Brief Description of Challenge:  Encrypt and Decrypt a string using the rail fence method
-///
+///     Brief Description of Challenge:  Encrypt and Decrypt a string using the rail fence method.
+///     You will need to see the visualization used in the challenge description to understand the process
 /// 
 ///
 ///     What was difficult about this challenge?
@@ -34,85 +34,107 @@ namespace DailyProgrammer_Template
     {
         static void Main(string[] args)
         {
-            RailFenceCipher encryptTest = new RailFenceCipher();
-            Console.WriteLine(encryptTest.Encrypt("THEQUICKBROWNFOXJUMPSOVERTHELAZYDOG", 4));
-            Console.WriteLine();
-            Console.WriteLine("TCNMRZHIKWFUPETAYEUBOOJSVHLDGQRXOEO");
-            Console.WriteLine();
-            Console.WriteLine(encryptTest.Decrypt("TCNMRZHIKWFUPETAYEUBOOJSVHLDGQRXOEO", 4));
-
-            Console.ReadKey();
-        }
-
-        /// <summary>
-        /// Simple function to illustrate how to use tests
-        /// </summary>
-        /// <param name="inputInteger"></param>
-        /// <returns></returns>
-        public static int MyTestFunction(int inputInteger)
-        {
-            return inputInteger;
         }
     }
 
+    /// <summary>
+    /// Encrypts and decrypts a string using the "Rail Fence Cipher" method
+    /// </summary>
     class RailFenceCipher
     {
         int counter = 1;
+        //used to change the direction of the counter (from adding to subtracting and back again)
         int direction = -1;
 
+        //Constructor
         public RailFenceCipher() { }
 
+        /// <summary>
+        /// Encrypt the input string based on a number of lines (zig-zag height)
+        /// </summary>
+        /// <param name="textToEncrypt">text to encrypt</param>
+        /// <param name="numLines">height of zig-zag</param>
+        /// <returns>encrypted text</returns>
         public string Encrypt(string textToEncrypt, int numLines)
         {
-            int lineCount = 0;
+            //initialize variables
+            int lineInFocus = 0;
             int currentLine = 0;
+            //return string to hold letters at they encrypted
             string encryptedText = string.Empty;
-            while (lineCount < numLines)
+
+            //process each line in zig-zag one at a time until all have been completed
+            while (lineInFocus < numLines)
             {
+                //start at the first (highest) line
                 currentLine = 0;
                 this.counter = 1;
+                //loop through every letter in the string
                 for (int i = 0; i < textToEncrypt.Length; i++)
                 {
-                    if (currentLine == lineCount)
+                    //if letter in string exists in the current horizontal line being analyzed (lineInFocus) add it to the return string
+                    if (currentLine == lineInFocus)
                     {
                         encryptedText += textToEncrypt[i];
                     }
+                    //move to the next horizontal line
                     currentLine += this.counter;
+                    //keep the currentLine within the height constrains of the zig-zag, change its direction up or down as needed
                     if (currentLine <= 0 || currentLine >= numLines - 1)
                     {
                         this.counter *= this.direction;
                     }
                 }
-                lineCount++;
+                //after anazlying entire string move onto the next horizontal line to focus on and pick letters from
+                lineInFocus++;
             }
             return encryptedText;
         }
 
+        /// <summary>
+        /// Decrypt the input string based on a number of lines (zig-zag height)
+        /// </summary>
+        /// <param name="textToDecrypt">text to decrypt</param>
+        /// <param name="numLines">height of zig-zag</param>
+        /// <returns>decrypted text</returns>
         public string Decrypt(string textToDecrypt, int numLines)
         {
-            int lineCount = 0;
+            //initialize variables
+            int lineInFocus = 0;
             int currentLine = 0;
+            //return string to hold decrypted letter (needs to have length established at beginning and equal to encrypted input string)
             string decryptedText = textToDecrypt;
+            //used to step through letters of encrypted input string one at a time
             int letterStepper = 0;
-            while (lineCount < numLines)
+            //process each line in zig-zag one at a time until all have been completed
+            while (lineInFocus < numLines)
             {
+                //start at the first (highest) line
                 currentLine = 0;
                 this.counter = 1;
+                //loop through every letter in the string
                 for (int i = 0; i < textToDecrypt.Length; i++)
                 {
-                    if (currentLine == lineCount)
+                    //if letter in string exists in the current horizontal line being analyzed (lineInFocus)...
+                    if (currentLine == lineInFocus)
                     {
+                        //insert the current letter of encrypted input text (based on letterStepper) into the return string at the index where it exists in the zig-zag...hard to explain in words
                         decryptedText = decryptedText.Insert(i, textToDecrypt[letterStepper].ToString());
+                        //using Insert pushes all letters in return string forward by one, so remove the proceeding index to maintain original length
                         decryptedText = decryptedText.Remove(i + 1, 1);
+                        //advance the letterstepper to use the next letter in the encrypted input string
                         letterStepper++;
                     }
+                    //move to the next horizontal line
                     currentLine += this.counter;
+                    //keep the currentLine within the height constrains of the zig-zag, change its direction up or down as needed
                     if (currentLine <= 0 || currentLine >= numLines - 1)
                     {
                         this.counter *= this.direction;
                     }
                 }
-                lineCount++;
+                //after anazlying entire string move onto the next horizontal line to focus on and pick letters from
+                lineInFocus++;
             }
             return decryptedText;
         }
@@ -126,14 +148,16 @@ namespace DailyProgrammer_Template
     [TestFixture]
     class Test
     {
+        RailFenceCipher testObject = new RailFenceCipher();
+
         //Test classes are declared with a return type of void.  Test classes also need a data annotation to mark them as a Test function
         [Test]
         public void MyValidTest()
         {
             //inside of the test, we can declare any variables that we'll need to test.  Typically, we will reference a function in your main program to test.
-            int result = Program.MyTestFunction(15);  // this function should return 15 if it is working correctly
+            string result = testObject.Encrypt("THEQUICKBROWNFOXJUMPSOVERTHELAZYDOG", 4);  // this function should return 15 if it is working correctly
             //now we test for the result.
-            Assert.IsTrue(result == 15, "This is the message that displays if it does not pass");
+            Assert.IsTrue(result == "TCNMRZHIKWFUPETAYEUBOOJSVHLDGQRXOEO", "This is the message that displays if it does not pass");
             // The format is:
             // Assert.IsTrue(some boolean condition, "failure message");
         }
@@ -141,8 +165,8 @@ namespace DailyProgrammer_Template
         [Test]
         public void MyInvalidTest()
         {
-            int result = Program.MyTestFunction(15);
-            Assert.IsFalse(result == 14);
+            string result = testObject.Decrypt("TCNMRZHIKWFUPETAYEUBOOJSVHLDGQRXOEO", 4);
+            Assert.IsFalse(result != "THEQUICKBROWNFOXJUMPSOVERTHELAZYDOG");
         }
     }
 #endregion
